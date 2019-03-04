@@ -104,7 +104,7 @@ class FrontEnd(object):
             cv2.putText(frameRet, "Batt: " + str(self.tello.get_battery()),(0,64),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
             cv2.putText(frameRet, "Faces: " + str(len(faces)),(0,128),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
 
-            frameRet=cv2.cvtColor(frameRet,cv2.COLOR_BGR2RGB)
+            frameRet = cv2.cvtColor(frameRet,cv2.COLOR_BGR2RGB)
 
             frameRet = np.rot90(frameRet)
             frameRet = np.flipud(frameRet)
