@@ -33,6 +33,8 @@ class FrontEnd(object):
         # Init Tello object that interacts with the Tello drone
         self.tello = Tello()
 
+        self.faceCascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_alt2.xml')
+
         # Drone velocities between -100~100
         self.for_back_velocity = 0
         self.left_right_velocity = 0
@@ -68,6 +70,7 @@ class FrontEnd(object):
 
         should_stop = False
         while not should_stop:
+            frameRet = frame_read.frame
 
             for event in pygame.event.get():
                 if event.type == USEREVENT + 1:
@@ -87,10 +90,27 @@ class FrontEnd(object):
                 break
 
             self.screen.fill([0, 0, 0])
-            frame = cv2.cvtColor(frame_read.frame, cv2.COLOR_BGR2RGB)
-            frame = np.rot90(frame)
-            frame = np.flipud(frame)
-            frame = pygame.surfarray.make_surface(frame)
+
+            gray  = cv2.cvtColor(frameRet, cv2.COLOR_BGR2GRAY)
+            faces = self.faceCascade.detectMultiScale(gray, scaleFactor=1.5, minNeighbors=2)
+
+            for (x, y, w, h) in faces:
+                fbCol = (255, 0, 0) #BGR 0-255 
+                fbStroke = 2
+                end_cord_x = x + w
+                end_cord_y = y + h
+                cv2.rectangle(frameRet, (x, y), (end_cord_x, end_cord_y), fbCol, fbStroke)
+
+            cv2.putText(frameRet, "Batt: " + str(self.tello.get_battery()),(0,64),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+            cv2.putText(frameRet, "Faces: " + str(len(faces)),(0,128),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+
+            frameRet=cv2.cvtColor(frameRet,cv2.COLOR_BGR2RGB)
+
+            frameRet = np.rot90(frameRet)
+            frameRet = np.flipud(frameRet)
+
+            frame = pygame.surfarray.make_surface(frameRet)
+
             self.screen.blit(frame, (0, 0))
             pygame.display.update()
 
