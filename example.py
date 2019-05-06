@@ -41,6 +41,7 @@ class FrontEnd(object):
         self.up_down_velocity = 0
         self.yaw_velocity = 0
         self.speed = 10
+        self.show_stats = False
 
         self.send_rc_control = False
 
@@ -101,8 +102,10 @@ class FrontEnd(object):
                 end_cord_y = y + h
                 cv2.rectangle(frameRet, (x, y), (end_cord_x, end_cord_y), fbCol, fbStroke)
 
-            cv2.putText(frameRet, "Batt: " + str(self.tello.get_battery()),(0,64),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
-            cv2.putText(frameRet, "Faces: " + str(len(faces)),(0,128),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+            if self.show_stats:
+                cv2.putText(frameRet, "Batt: " + str(self.tello.get_battery()),(0,32),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+                cv2.putText(frameRet, "Wifi: " + str(self.tello.get_wifi()),(0,64),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
+                cv2.putText(frameRet, "Faces: " + str(len(faces)),(0,96),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,255),2)
 
             frameRet = cv2.cvtColor(frameRet,cv2.COLOR_BGR2RGB)
 
@@ -160,6 +163,8 @@ class FrontEnd(object):
         elif key == pygame.K_l:  # land
             self.tello.land()
             self.send_rc_control = False
+        elif key == pygame.K_h: # stats
+            self.show_stats = not self.show_stats
 
     def update(self):
         """ Update routine. Send velocities to Tello."""
